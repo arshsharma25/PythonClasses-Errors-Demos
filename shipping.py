@@ -40,13 +40,41 @@ class RefrigeratedShippingContainer(ShippingContainer):
         :type celsius: object
         """
         super.__init__(owner_code, contents, **kwargs)
-        if celsius > RefrigeratedShippingContainer.MAX_CELSIUS:
-            raise ValueError("Temperature too hot!")
-        self._celsius = celsius
+        """Self encapsulation where even uses of attributes internal to the class go through the property getter and 
+        setter rather than directly accessing underlying attribute. It is a technique for helping establish and 
+        maintain class invariants such as temperature constraint """
+        self.celsius = celsius
 
+    @staticmethod
+    def _c_to_f(celsius):
+        return celsius * 9/5 + 32
+
+    @staticmethod
+    def _f_to_c(fahrenheit):
+        return (fahrenheit - 32) * 5 / 9
+
+    # In pythons we do not use getter and setter methods but use the below two methods to set and get our attributes
+    """ Enables to make celsius read only and not for public use """
+    # getter method in python
     @property
     def celsius(self):
         return self._celsius
+
+    """ Using the setter decorator in property taking celsius as decorator """
+    # setter method in python
+    @celsius.setter
+    def celsius(self, value):
+        if value > RefrigeratedShippingContainer.MAX_CELSIUS:
+            raise ValueError("Temperature too hot!")
+        self._celsius = value
+
+    @property
+    def fahrenheit(self):
+        return RefrigeratedShippingContainer._c_to_f(self.celsius)
+
+    @fahrenheit.setter
+    def fahrenheit(self, value):
+        self.celsius = RefrigeratedShippingContainer._f_to_c(value)
 
     @staticmethod
     def _make_bic_code(owner_code: object, serial: object) -> object:
