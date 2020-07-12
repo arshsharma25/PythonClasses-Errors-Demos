@@ -36,6 +36,10 @@ class ShippingContainer:
 
     @property
     def volume_ft3(self):
+        return self._calc_volume()
+
+    # Template method
+    def _calc_volume(self):
         return ShippingContainer.HEIGHT_FT * ShippingContainer.WIDTH_FT * self.length_ft
 
 
@@ -75,6 +79,9 @@ class RefrigeratedShippingContainer(ShippingContainer):
     # setter method in python
     @celsius.setter
     def celsius(self, value):
+        self._set_celsius(value)
+
+    def _set_celsius(self, value):
         if value > RefrigeratedShippingContainer.MAX_CELSIUS:
             raise ValueError("Temperature too hot!")
         self._celsius = value
@@ -88,9 +95,9 @@ class RefrigeratedShippingContainer(ShippingContainer):
         self.celsius = RefrigeratedShippingContainer._f_to_c(value)
 
     @property
-    def volume_ft3(self):
+    def _calc_volume(self):
         return (
-            super().volume_ft3
+            super()._calc_volume()
             - RefrigeratedShippingContainer.FRIDGE_VOLUME_FT3
         )
 
@@ -103,9 +110,8 @@ class HeatedRefrigeratedShippingContainer(RefrigeratedShippingContainer):
 
     MIN_CELSIUS = -20
 
-    @RefrigeratedShippingContainer.celsius.setter
-    def celsius(self, value):
+    def _set_celsius(self, value):
         if value <= HeatedRefrigeratedShippingContainer.MIN_CELSIUS:
             raise ValueError("Temperature too cold!")
-        RefrigeratedShippingContainer.celsius.fset(self, value)
+        super()._set_celsius(value)
 
